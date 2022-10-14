@@ -1,7 +1,7 @@
 
 import './App.css';
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import firebaseConfig from './firebase.config';
 import { useState } from 'react';
 
@@ -33,9 +33,28 @@ function App() {
     .catch( err => console.log(err))
   }
 
+  const handleSignOut = () =>{
+    const auth = getAuth()
+    signOut(auth)
+    .then(res => {
+      const signedOutUser = {
+        isSignedIn : false,
+        name : '',
+        emailAddress : '',
+        userImage : ''
+      }
+      setUser(signedOutUser)
+    })
+    .catch( err => console.log(err))
+  }
+
   return (
     <div className="App">
-      <button onClick={handleSignIn}>Sign In </button>
+      {
+        user.isSignedIn ? <button onClick={handleSignOut}>Sign Out </button> :
+                          <button onClick={handleSignIn}>Sign In </button>
+      }
+      
       {
         user.isSignedIn && <div>
             <p>Welcome <b> { user.name } </b></p>
