@@ -46,6 +46,14 @@ function App() {
       setUser(signedOutUser)
     })
     .catch( err => console.log(err))
+  } 
+
+  const handleSubmit = () =>{
+    console.log('form submitted')
+  }
+
+  const handleBlur = (e) =>{
+    console.log(e.target.value)
   }
 
   return (
@@ -54,6 +62,15 @@ function App() {
         user.isSignedIn ? <button onClick={handleSignOut}>Sign Out </button> :
                           <button onClick={handleSignIn}>Sign In </button>
       }
+      <br />
+      <br />
+      <form action="" onSubmit={handleSubmit}>
+        <input type="email" onBlur={handleBlur} placeholder='Enter your email....' name="email" id="email" />
+        <br /><br />
+        <input type="password" onBlur={handleBlur} placeholder='Enter password....' name="password" id="pass" />
+        <br /><br />
+        <button type='submit'>Login</button>
+      </form>
       
       {
         user.isSignedIn && <div>

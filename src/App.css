@@ -14,3 +14,8 @@
   border-radius: 7px;
   cursor: pointer;
 }
+
+.App form input {
+  padding: 5px 10px;
+  font-size: 18px;
+}
