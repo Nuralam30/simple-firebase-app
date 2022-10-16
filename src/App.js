@@ -13,7 +13,8 @@ function App() {
   const [ user, setUser ] = useState({
     isSignedIn : false,
     name : '',
-    emailAddress : '',
+    email : '',
+    password : '',
     userImage : ''
   });
 
@@ -25,7 +26,7 @@ function App() {
       const signedInUser = {
         isSignedIn : true,
         name : displayName,
-        emailAddress : email,
+        email : email,
         userImage : photoURL
       }
       setUser(signedInUser)
@@ -40,7 +41,7 @@ function App() {
       const signedOutUser = {
         isSignedIn : false,
         name : '',
-        emailAddress : '',
+        email : '',
         userImage : ''
       }
       setUser(signedOutUser)
@@ -53,13 +54,21 @@ function App() {
   }
 
   const handleBlur = (e) =>{
+    let isFormValid = true;
     if(e.target.name === 'email'){
-      const isEmailValid = /\S+@\S+\.\S+/.test(e.target.value);
-      console.log(isEmailValid)
+      isFormValid = /\S+@\S+\.\S+/.test(e.target.value);
     }
     if(e.target.name === 'password'){
-      const isPasswordValid = e.target.value.length > 8;
-      console.log(isPasswordValid)
+      const passLength = e.target.value.length > 8;
+      const isPasswordValid = /\d{1}/.test(e.target.value);
+      isFormValid = passLength && isPasswordValid;
+      console.log(isFormValid)
+    }
+    if(isFormValid){
+      const newUserInfo = {...user};
+      console.log(newUserInfo)
+      newUserInfo[e.target.name] = e.target.value;
+      setUser(newUserInfo)
     }
   }
 
@@ -78,11 +87,14 @@ function App() {
         <br /><br />
         <button type='submit'>Login</button>
       </form>
+
+      <p>email : {user.email}</p>
+      <p>password : {user.password}</p>
       
       {
         user.isSignedIn && <div>
             <p>Welcome <b> { user.name } </b></p>
-            <p>Your email : { user.emailAddress} </p>
+            <p>Your email : { user.email} </p>
             <img src={user.userImage} alt="" />
           </div>
       }
