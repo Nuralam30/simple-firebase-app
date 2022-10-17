@@ -1,7 +1,7 @@
 
 import './App.css';
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
 import firebaseConfig from './firebase.config';
 import { useState } from 'react';
 
@@ -15,7 +15,10 @@ function App() {
     name : '',
     email : '',
     password : '',
-    userImage : ''
+    userImage : '',
+    text : '',
+    error : '',
+    success : false
   });
 
   const handleSignIn = () =>{
@@ -49,28 +52,50 @@ function App() {
     .catch( err => console.log(err))
   } 
 
-  const handleSubmit = () =>{
-    console.log('form submitted')
-  }
-
   const handleBlur = (e) =>{
-    let isFormValid = true;
+    let isFieldValid = true;
     if(e.target.name === 'email'){
-      isFormValid = /\S+@\S+\.\S+/.test(e.target.value);
+      isFieldValid = /\S+@\S+\.\S+/.test(e.target.value);
     }
     if(e.target.name === 'password'){
       const passLength = e.target.value.length > 8;
       const isPasswordValid = /\d{1}/.test(e.target.value);
-      isFormValid = passLength && isPasswordValid;
-      console.log(isFormValid)
+      isFieldValid = passLength && isPasswordValid;
     }
-    if(isFormValid){
+    if(isFieldValid){
       const newUserInfo = {...user};
-      console.log(newUserInfo)
       newUserInfo[e.target.name] = e.target.value;
       setUser(newUserInfo)
     }
   }
+
+  const handleText = () =>{
+    const newUserInfo = {...user};
+    newUserInfo.text = true;
+    setUser(newUserInfo);
+  }
+  
+  const handleSubmit = (e) =>{
+    if(user.email && user.password){
+      const auth = getAuth();
+      createUserWithEmailAndPassword(auth, user.email, user.password)
+      .then( res =>{
+        const newUserInfo = {...user};
+        newUserInfo.error = '';
+        newUserInfo.success = true;
+        setUser(newUserInfo);
+      })
+      .catch( err => {
+        var errMessage = err.message;
+        const newUserInfo = {...user};
+        newUserInfo.error = errMessage;
+        newUserInfo.success = false;
+        setUser(newUserInfo);
+      })
+    }
+    e.preventDefault();
+  }
+
 
   return (
     <div className="App">
@@ -81,16 +106,23 @@ function App() {
       <br />
       <br />
       <form action="" onSubmit={handleSubmit}>
-        <input type="email" onBlur={handleBlur} placeholder='Enter your email....' name="email" id="email" />
+      <input type="text" onBlur={handleBlur} placeholder='Enter your name....' name="name" id="userName" />
         <br /><br />
-        <input type="password" onBlur={handleBlur} placeholder='Enter password....' name="password" id="pass" />
+        <input type="email" onBlur={handleBlur} placeholder='Enter your email....' name="email" id="email" required />
+        <br /><br />
+        <input type="password" onBlur={handleBlur} onFocus={handleText} placeholder='Enter password....' name="password" id="pass" required />
+        <br />
+        {
+          user.password ? <span className='pass-text green-text'>***must include a digit and 8 character***</span> :
+                      <span className='pass-text red-text'>***must include a digit and 8 character***</span>
+        }
         <br /><br />
         <button type='submit'>Login</button>
       </form>
 
-      <p>email : {user.email}</p>
-      <p>password : {user.password}</p>
-      
+      <p className="error-message">{user.error}</p>
+      {user.success && <p className="success-message">User created successfully</p>}
+
       {
         user.isSignedIn && <div>
             <p>Welcome <b> { user.name } </b></p>
