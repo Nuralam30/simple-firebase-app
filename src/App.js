@@ -1,7 +1,7 @@
 
 import './App.css';
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import firebaseConfig from './firebase.config';
 import { useState } from 'react';
 
@@ -77,7 +77,7 @@ function App() {
   }
   
   const handleSubmit = (e) =>{
-    if(user.email && user.password){
+    if(newUser && user.email && user.password){
       const auth = getAuth();
       createUserWithEmailAndPassword(auth, user.email, user.password)
       .then( res =>{
@@ -92,6 +92,23 @@ function App() {
         newUserInfo.error = errMessage;
         newUserInfo.success = false;
         setUser(newUserInfo);
+      })
+    }
+    if(!newUser && user.email && user.password){
+      const auth = getAuth();
+      signInWithEmailAndPassword(auth, user.email, user.password)
+      .then(res =>{
+        const userSignIn = {...user};
+        userSignIn.error = '';
+        userSignIn.success = true;
+        setUser(userSignIn);
+      })
+      .catch(err =>{
+        var errMessage = err.message;
+        const userSignIn = {...user};
+        userSignIn.error = errMessage;
+        userSignIn.success = false;
+        setUser(userSignIn);
       })
     }
     e.preventDefault();
@@ -123,7 +140,7 @@ function App() {
       </form>
 
       <p className="error-message">{user.error}</p>
-      {user.success && <p className="success-message">User created successfully</p>}
+      {user.success && <p className="success-message">User {newUser ? 'created' : 'Logged In'} successfully</p>}
 
       {
         user.isSignedIn && <div>
