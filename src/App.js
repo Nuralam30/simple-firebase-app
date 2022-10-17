@@ -10,6 +10,7 @@ const app = initializeApp(firebaseConfig);
 function App() {
 
   const provider = new GoogleAuthProvider();
+  const [newUser, setNewUser] = useState(false)
   const [ user, setUser ] = useState({
     isSignedIn : false,
     name : '',
@@ -105,8 +106,9 @@ function App() {
       }
       <br />
       <br />
+      <span><input type="checkbox" name="newUser" onChange={() => setNewUser(!newUser)} id="" />New User Register</span>
       <form action="" onSubmit={handleSubmit}>
-      <input type="text" onBlur={handleBlur} placeholder='Enter your name....' name="name" id="userName" />
+        {newUser && <input type="text" onBlur={handleBlur} placeholder='Enter your name....' name="name" id="userName" />}
         <br /><br />
         <input type="email" onBlur={handleBlur} placeholder='Enter your email....' name="email" id="email" required />
         <br /><br />
