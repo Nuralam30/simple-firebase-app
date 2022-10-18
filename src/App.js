@@ -1,7 +1,7 @@
 
 import './App.css';
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, FacebookAuthProvider } from 'firebase/auth';
 import firebaseConfig from './firebase.config';
 import { useState } from 'react';
 
@@ -9,7 +9,8 @@ const app = initializeApp(firebaseConfig);
 
 function App() {
 
-  const provider = new GoogleAuthProvider();
+  const googleProvider = new GoogleAuthProvider();
+  const fbProvider = new FacebookAuthProvider();
   const [newUser, setNewUser] = useState(false)
   const [ user, setUser ] = useState({
     isSignedIn : false,
@@ -24,7 +25,7 @@ function App() {
 
   const handleSignIn = () =>{
     const auth = getAuth();
-    signInWithPopup(auth, provider)
+    signInWithPopup(auth, googleProvider)
     .then(res => {
       const { displayName, email, photoURL} = res.user;
       const signedInUser = {
@@ -52,6 +53,20 @@ function App() {
     })
     .catch( err => console.log(err))
   } 
+
+  const handleFbSignIn = () =>{
+    const auth = getAuth();
+    signInWithPopup(auth, fbProvider)
+      .then((result) => {
+        
+        const user = result.user;
+        console.log(user)
+      })
+      .catch((error) => {
+        const errorMessage = error.message;
+        console.log(errorMessage)
+      });
+  }
 
   const handleBlur = (e) =>{
     let isFieldValid = true;
@@ -137,6 +152,8 @@ function App() {
         user.isSignedIn ? <button onClick={handleSignOut}>Sign Out </button> :
                           <button onClick={handleSignIn}>Sign In </button>
       }
+      <br />
+      <button onClick={handleFbSignIn}> Sign in with Facebook</button>
       <br />
       <br />
       <span><input type="checkbox" name="newUser" onChange={() => setNewUser(!newUser)} id="" />New User Register</span>
