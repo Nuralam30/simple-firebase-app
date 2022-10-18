@@ -1,7 +1,7 @@
 
 import './App.css';
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import firebaseConfig from './firebase.config';
 import { useState } from 'react';
 
@@ -85,6 +85,7 @@ function App() {
         newUserInfo.error = '';
         newUserInfo.success = true;
         setUser(newUserInfo);
+        updateUserInfo(user.name)
       })
       .catch( err => {
         var errMessage = err.message;
@@ -102,6 +103,7 @@ function App() {
         userSignIn.error = '';
         userSignIn.success = true;
         setUser(userSignIn);
+        console.log('user info', res.user)
       })
       .catch(err =>{
         var errMessage = err.message;
@@ -112,6 +114,20 @@ function App() {
       })
     }
     e.preventDefault();
+  }
+
+  const updateUserInfo = (name) =>{
+    const auth = getAuth();
+    updateProfile(auth.currentUser, {
+      displayName : name
+    })
+    .then(res => {
+      console.log('user info updated successfully');
+    })
+    .catch((err) => {
+      const errMessage = err.message;
+      console.log(errMessage)
+    });
   }
 
 
@@ -136,7 +152,7 @@ function App() {
                       <span className='pass-text red-text'>***must include a digit and 8 character***</span>
         }
         <br /><br />
-        <button type='submit'>Login</button>
+        <button type='submit'>{newUser ? 'Sign Up' : 'Sign in'}</button>
       </form>
 
       <p className="error-message">{user.error}</p>
